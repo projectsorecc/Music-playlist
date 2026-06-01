@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Premium Keroncong Player</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
     <style>
         * {
             box-sizing: border-box;
@@ -15,12 +18,12 @@
             font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #060608; /* Hitam pekat OLED friendly agar hemat baterai */
             color: #ffffff;
-            height: 100vh;
+            min-height: 100vh; /* PERBAIKAN: Menggunakan min-height agar elastis */
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Mengubah arah layout agar footer bisa di bawah */
+            justify-content: space-between; /* PERBAIKAN: Memaksa footer berada di ujung bawah bodi */
             align-items: center;
-            padding: 20px;
-            overflow: hidden;
+            padding: 30px 20px 10px 20px; /* Jarak padding disesuaikan */
             position: relative;
         }
 
@@ -51,6 +54,7 @@
             border: 1px solid rgba(201, 146, 74, 0.15);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
             z-index: 2;
+            margin: auto 0; /* Menjaga kartu tetap tepat di tengah ruang kosong */
         }
 
         /* Lingkaran Audio Avatar */
@@ -154,33 +158,187 @@
             opacity: 0.001;
             overflow: hidden;
         }
+
+        /* ====================================================
+           GAYA TOMBOL PORTOFOLIO
+           ==================================================== */
+        .portfolio-wrapper {
+            position: fixed;
+            bottom: 65px; /* Disesuaikan agar posisinya pas di atas footer baru */
+            right: 25px;
+            display: flex;
+            align-items: center;
+            z-index: 999;
+        }
+
+        /* Tombol fisik utama 46px */
+        .portfolio-float-btn {
+            position: relative;
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, #c9924a, #85581A);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(201, 146, 74, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            z-index: 2;
+            transition: transform 0.3s ease;
+            animation: button-heartbeat 2s infinite ease-in-out;
+        }
+
+        /* Lapisan pendaran detak */
+        .portfolio-float-btn::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #c9924a;
+            background: rgba(201, 146, 74, 0.25);
+            border-radius: 50%;
+            z-index: -1;
+            transform: scale(1);
+            transform-origin: center;
+            animation: gold-pulse 2s infinite ease-out;
+            box-sizing: content-box;
+        }
+
+        /* Desain Ikon dengan transisi putar halus */
+        .portfolio-float-btn .material-symbols-outlined {
+            font-size: 21px; 
+            color: #ffffff;
+            user-select: none;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Teks "Kunjungi Pembuat" */
+        .portfolio-text {
+            background: rgba(18, 18, 22, 0.95);
+            border: 1px solid rgba(201, 146, 74, 0.3);
+            color: #e5d5c5;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+            padding-right: 28px;
+            border-radius: 20px 0 0 20px;
+            margin-right: -18px;
+            text-decoration: none; 
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            white-space: nowrap;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: -5px 5px 15px rgba(0,0,0,0.4);
+        }
+
+        /* EFEK KONDISI AKTIF (SAAT DIKLIK) */
+        .portfolio-wrapper.active .portfolio-float-btn {
+            animation: none; 
+            transform: scale(1) !important;
+        }
+
+        .portfolio-wrapper.active .portfolio-float-btn .material-symbols-outlined {
+            transform: rotate(360deg);
+        }
+
+        .portfolio-wrapper.active .portfolio-text {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        /* Animasi Hentakan Tombol Utama */
+        @keyframes button-heartbeat {
+            0%, 100% { transform: scale(1); }
+            20% { transform: scale(1.08); }
+            40% { transform: scale(0.96); }
+            60% { transform: scale(1.04); }
+        }
+
+        /* Animasi Pendaran Radius Emas */
+        @keyframes gold-pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            40% { transform: scale(1.25); opacity: 0.4; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* ====================================================
+           GAYA BAGIAN FOOTER (HAK CIPTA FIXED)
+           ==================================================== */
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.75rem;
+            color: #4a4a4f; /* Abu-abu oled friendly */
+            letter-spacing: 0.8px;
+            z-index: 2;
+            background: transparent;
+            flex-shrink: 0; /* PERBAIKAN: Mencegah Chrome mengecilkan baris footer menjadi 0px */
+        }
     </style>
 </head>
 <body>
 
     <div class="player-card">
-        <!-- Avatar Audio Premium -->
         <div class="audio-wave-avatar" id="avatar-glow">📻</div>
         
         <h1>Keroncong Tempo Dulu</h1>
         <div class="sub">Nostalgia Musik Indonesia</div>
 
-        <!-- Status Musik -->
         <div id="status-box">SIAP DIPUTAR</div>
 
-        <!-- Tombol Play Kendali -->
         <div class="controls">
             <button class="btn-play" onclick="toggleMulai()" id="btn-play">PLAY</button>
         </div>
     </div>
 
-    <!-- Frame YouTube Rahasia -->
+    <div class="portfolio-wrapper" id="portfolio-container">
+        <a href="#" class="portfolio-text" target="_blank" id="portfolio-link">Kunjungi Pembuat</a>
+        
+        <div class="portfolio-float-btn" onclick="aksiTombol(event)">
+            <span class="material-symbols-outlined">contact_page</span>
+        </div>
+    </div>
+
     <div class="hidden-holder">
         <div id="secret-player"></div>
     </div>
 
+    <footer>
+        &copy; 2026 Projectsorecc. All Rights Reserved.
+    </footer>
+
     <script>
-        // Memuat YouTube Player API secara otomatis
+        function aksiTombol(event) {
+            event.stopPropagation(); 
+            var wadah = document.getElementById('portfolio-container');
+            
+            if (!wadah.classList.contains('active')) {
+                wadah.classList.add('active');
+            } else {
+                document.getElementById('portfolio-link').click();
+                wadah.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            var wadah = document.getElementById('portfolio-container');
+            if (wadah.classList.contains('active')) {
+                wadah.classList.remove('active');
+            }
+        });
+
+        // ====================================================
+        // SISTEM ENGINE AUDIO PLAYER YOUTUBE
+        // ====================================================
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -189,7 +347,7 @@
         var player;
         var playing = false;
         var videoId = "FSrXrWoHQHY"; 
-        var antiTidurInterval; // Interval penjaga sistem Android agar tidak tertidur
+        var antiTidurInterval; 
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('secret-player', {
@@ -211,13 +369,11 @@
         }
 
         function onPlayerReady(event) {
-            // Paksa sistem menggunakan kualitas video terendah (144p) demi menghemat kuota internet Anda
             if(player.setPlaybackQuality) {
                 player.setPlaybackQuality('small'); 
             }
         }
 
-        // Fungsi pemicu tombol Play/Pause
         function toggleMulai() {
             if (!player) return;
             if (!playing) {
@@ -228,7 +384,6 @@
             }
         }
 
-        // Mengatur status tampilan berdasarkan respon asli YouTube
         function onStateChange(event) {
             const statusBox = document.getElementById('status-box');
             const btnPlay = document.getElementById('btn-play');
@@ -244,16 +399,9 @@
                 btnPlay.style.border = "2px solid #c9924a";
                 btnPlay.style.boxShadow = "0 8px 25px rgba(0, 0, 0, 0.5)";
                 
-                // Menjalankan animasi gelombang riak neon
                 var sheet = window.document.styleSheets[0];
                 sheet.insertRule('.audio-wave-avatar::after { animation-play-state: running !important; }', sheet.cssRules.length);
 
-                // ====================================================
-                // TRIK ANTI-TIDUR: Mengecek kondisi player setiap 8 detik.
-                // Jika sistem Android mencoba menjeda video secara paksa
-                // di latar belakang, skrip ini akan otomatis memerintahkan
-                // player untuk melanjutkan pemutaran musik.
-                // ====================================================
                 clearInterval(antiTidurInterval);
                 antiTidurInterval = setInterval(function() {
                     if (player && player.getPlayerState() === YT.PlayerState.PAUSED && playing) {
@@ -263,7 +411,6 @@
                 }, 8000);
 
             } else if (event.data == YT.PlayerState.PAUSED) {
-                // Jika dijeda secara manual oleh klik pengguna, matikan sistem anti-tidur
                 if (playing) { 
                     clearInterval(antiTidurInterval);
                 }
@@ -277,7 +424,6 @@
                 btnPlay.style.border = "none";
                 btnPlay.style.boxShadow = "0 8px 25px rgba(201, 146, 74, 0.4)";
                 
-                // Menghentikan animasi gelombang riak neon
                 var sheet = window.document.styleSheets[0];
                 sheet.insertRule('.audio-wave-avatar::after { animation-play-state: paused !important; }', sheet.cssRules.length);
                 
