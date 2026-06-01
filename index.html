@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Premium Keroncong Player</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #060608; /* Hitam pekat OLED friendly agar hemat baterai */
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Latar belakang pendaran cahaya emas estetik */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #c9924a, #85581A);
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.15;
+            z-index: 1;
+            top: 20%;
+        }
+
+        /* Wadah Utama Glassmorphism Premium */
+        .player-card {
+            background: rgba(18, 18, 22, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            width: 100%;
+            max-width: 360px;
+            padding: 45px 28px;
+            border-radius: 32px;
+            text-align: center;
+            border: 1px solid rgba(201, 146, 74, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+            z-index: 2;
+        }
+
+        /* Lingkaran Audio Avatar */
+        .audio-wave-avatar {
+            width: 130px;
+            height: 130px;
+            background: linear-gradient(135deg, #16161a, #232329);
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5rem;
+            position: relative;
+            border: 2px solid rgba(201, 146, 74, 0.3);
+            box-shadow: 0 0 30px rgba(201, 146, 74, 0.1);
+        }
+
+        /* Efek Gelombang Riak Neon */
+        .audio-wave-avatar::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #c9924a;
+            opacity: 0;
+            box-shadow: 0 0 20px #c9924a;
+            animation: ripple 2s infinite ease-out;
+            animation-play-state: paused;
+            box-sizing: border-box;
+        }
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+
+        /* Judul Lagu & Artis */
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #ffffff, #e5d5c5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sub {
+            font-size: 0.9rem;
+            color: #8e8e93;
+            margin-bottom: 35px;
+            font-weight: 400;
+        }
+
+        /* Kotak Status Informasi */
+        #status-box {
+            font-size: 0.75rem;
+            color: #c9924a;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid rgba(201, 146, 74, 0.3);
+            padding: 6px 16px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 35px;
+            background: rgba(201, 146, 74, 0.05);
+            transition: all 0.3s;
+        }
+
+        /* Tombol Play Besar */
+        .btn-play {
+            background: linear-gradient(135deg, #c9924a, #a67332);
+            color: #ffffff;
+            border: none;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(201, 146, 74, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            transition: all 0.2s ease;
+        }
+        .btn-play:active {
+            transform: scale(0.92);
+            box-shadow: 0 4px 10px rgba(201, 146, 74, 0.2);
+        }
+
+        /* Trik Hemat Kuota: Video dikecilkan 1x1 piksel tak terlihat */
+        .hidden-holder {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            opacity: 0.001;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="player-card">
+        <!-- Avatar Audio Premium -->
+        <div class="audio-wave-avatar" id="avatar-glow">📻</div>
+        
+        <h1>Keroncong Tempo Dulu</h1>
+        <div class="sub">Nostalgia Musik Indonesia</div>
+
+        <!-- Status Musik -->
+        <div id="status-box">SIAP DIPUTAR</div>
+
+        <!-- Tombol Play Kendali -->
+        <div class="controls">
+            <button class="btn-play" onclick="toggleMulai()" id="btn-play">PLAY</button>
+        </div>
+    </div>
+
+    <!-- Frame YouTube Rahasia -->
+    <div class="hidden-holder">
+        <div id="secret-player"></div>
+    </div>
+
+    <script>
+        // Memuat YouTube Player API secara otomatis
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var playing = false;
+        var videoId = "FSrXrWoHQHY"; 
+        var antiTidurInterval; // Interval penjaga sistem Android agar tidak tertidur
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('secret-player', {
+                height: '1',
+                width: '1',
+                videoId: videoId,
+                playerVars: {
+                    'playsinline': 1,
+                    'controls': 0,
+                    'disablekb': 1,
+                    'modestbranding': 1,
+                    'rel': 0
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // Paksa sistem menggunakan kualitas video terendah (144p) demi menghemat kuota internet Anda
+            if(player.setPlaybackQuality) {
+                player.setPlaybackQuality('small'); 
+            }
+        }
+
+        // Fungsi pemicu tombol Play/Pause
+        function toggleMulai() {
+            if (!player) return;
+            if (!playing) {
+                player.playVideo();
+                if(player.setPlaybackQuality) player.setPlaybackQuality('small');
+            } else {
+                player.pauseVideo();
+            }
+        }
+
+        // Mengatur status tampilan berdasarkan respon asli YouTube
+        function onStateChange(event) {
+            const statusBox = document.getElementById('status-box');
+            const btnPlay = document.getElementById('btn-play');
+
+            if (event.data == YT.PlayerState.PLAYING) {
+                playing = true;
+                statusBox.innerText = "MEMUTAR • HEMAT DATA";
+                statusBox.style.color = "#c9924a";
+                statusBox.style.borderColor = "rgba(201, 146, 74, 0.6)";
+                statusBox.style.background = "rgba(201, 146, 74, 0.1)";
+                btnPlay.innerText = "PAUSE";
+                btnPlay.style.background = "linear-gradient(135deg, #222, #111)";
+                btnPlay.style.border = "2px solid #c9924a";
+                btnPlay.style.boxShadow = "0 8px 25px rgba(0, 0, 0, 0.5)";
+                
+                // Menjalankan animasi gelombang riak neon
+                var sheet = window.document.styleSheets[0];
+                sheet.insertRule('.audio-wave-avatar::after { animation-play-state: running !important; }', sheet.cssRules.length);
+
+                // ====================================================
+                // TRIK ANTI-TIDUR: Mengecek kondisi player setiap 8 detik.
+                // Jika sistem Android mencoba menjeda video secara paksa
+                // di latar belakang, skrip ini akan otomatis memerintahkan
+                // player untuk melanjutkan pemutaran musik.
+                // ====================================================
+                clearInterval(antiTidurInterval);
+                antiTidurInterval = setInterval(function() {
+                    if (player && player.getPlayerState() === YT.PlayerState.PAUSED && playing) {
+                        player.playVideo(); 
+                        if(player.setPlaybackQuality) player.setPlaybackQuality('small');
+                    }
+                }, 8000);
+
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                // Jika dijeda secara manual oleh klik pengguna, matikan sistem anti-tidur
+                if (playing) { 
+                    clearInterval(antiTidurInterval);
+                }
+                playing = false;
+                statusBox.innerText = "MUSIK DIJEDA";
+                statusBox.style.color = "#8e8e93";
+                statusBox.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                statusBox.style.background = "transparent";
+                btnPlay.innerText = "PLAY";
+                btnPlay.style.background = "linear-gradient(135deg, #c9924a, #a67332)";
+                btnPlay.style.border = "none";
+                btnPlay.style.boxShadow = "0 8px 25px rgba(201, 146, 74, 0.4)";
+                
+                // Menghentikan animasi gelombang riak neon
+                var sheet = window.document.styleSheets[0];
+                sheet.insertRule('.audio-wave-avatar::after { animation-play-state: paused !important; }', sheet.cssRules.length);
+                
+            } else if (event.data == YT.PlayerState.BUFFERING) {
+                statusBox.innerText = "MEMUAT AUDIO...";
+                statusBox.style.color = "#ffffff";
+            }
+        }
+    </script>
+</body>
+</html>
